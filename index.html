@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>SxS Handshake example</title>
+    <style>
+        html,
+        body {
+            width: 100%;
+            text-align: center;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #333;
+            background: #e2e1e0;
+        }
+
+        .wrapper {
+            box-sizing: content-box;
+            display: inline-block;
+            margin: 1rem auto;
+            padding: 1rem;
+            text-align: left;
+            border-radius: 4px;
+            background: #fff;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+        }
+
+        input[type=text] {
+            width: 100%;
+        }
+
+        input {
+            margin-top: 0.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        button {
+            margin-top: 1rem;
+            cursor: pointer;
+        }
+
+        button.green {
+            border-radius: 4px;
+            padding: 4px 8px;
+            border-width: 0;
+            color: #fff;
+            background-color: #43f243;
+            box-shadow: 0px 2px 4px rgba(55, 114, 12, .8);
+            transition: background-color .3s;
+        }
+
+        button.green:hover {
+            background-color: #3cd83c;
+        }
+
+        .title {
+            font-weight: bold;
+            color: #34ba34;
+        }
+
+        fieldset {
+            margin: 0;
+            border: 1px solid #808080;
+        }
+    </style>
+</head>
+
+<body onload="onLoad()">
+
+    <div class="wrapper">
+        <label class="title" for="producId">Product ID:</label>
+        <br>
+        <input id="productId" type="text" placeholder="COMPANY.APPID">
+        <br>
+        <label class="title" for="apiKey">API Key:</label>
+        <br>
+        <input id="apiKey" type="text" placeholder="xxx">
+        <br>
+        <fieldset>
+            <legend class="title">Symbology</legend>
+            <div>
+                <span>
+                    <input type="checkbox" id="RIC-checkbox" name="symbology" value="RIC">
+                    <label for="coding">RIC</label>
+                </span>
+                <span>
+                    <input type="checkbox" id="ISIN-checkbox" name="symbology" value="ISIN">
+                    <label for="music">ISIN</label>
+                </span>
+                <span>
+                    <input type="checkbox" id="ticker-checkbox" name="symbology" value="ticker">
+                    <label for="music">ticker</label>
+                </span>
+                <span>
+                    <input type="checkbox" id="SEDOL-checkbox" name="symbology" value="SEDOL">
+                    <label for="music">SEDOL</label>
+                </span>
+            </div>
+        </fieldset>
+        <button class="green" onclick="secureHandshake()">Submit</button>
+    </div>
+
+    <script src="lib/library.min.js"></script>
+    <script>
+        class Crypto {
+            constructor(keystore, jwe, buffer) {
+                this.keystore = keystore;
+                this.jwe = jwe;
+                this.Buffer = buffer;
+            }
+
+            generateKey() {
+                const option = {
+                    kid: 'SxSDemoAppKey',
+                    alg: '',
+                    use: 'enc',
+                };
+                return this.keystore.generate('RSA', 2048, option);
+            }
+
+            addKey(publicKeyPEM) {
+                const props = {
+                    kty: 'RSA',
+                    kid: 'SxSKey',
+                };
+                return this.keystore.add(publicKeyPEM, 'pem', props);
+            }
+
+            getAppPublicKey() {
+                return this.keystore.get('SxSDemoAppKey').toPEM();
+            }
+
+            encrypt(rawData) {
+                const options = {
+                    format: 'compact',
+                    contentAlg: 'A256GCM',
+                };
+                return this.jwe.createEncrypt(options, this.keystore.get('SxSKey'))
+                    .update(new this.Buffer(rawData))
+                    .final()
+                    .then((encData) => encData);
+            }
+
+            decrypt(encData) {
+                return this.jwe.createDecrypt(this.keystore.get('SxSDemoAppKey'))
+                    .decrypt(encData)
+                    .then((decData) => decData.plaintext.toString());
+            }
+        }
+
+        const jose = lib.jose;
+        const Buffer = lib.Buffer;
+        const cryptography = new Crypto(jose.JWK.createKeyStore(), jose.JWE, Buffer);
+
+        const port = 9000;
+
+        const baseUrl = 'http://127.0.0.1:';
+        const wsBaseUrl = 'ws://127.0.0.1:';
+        const pingPath = '/ping';
+        const sxsPath = '/sxs/s/v1';    // NOTICE there is '/s' added in secure connection
+        const getPublicKeyPath = '/getPublicKey';
+        const wsPath = '/notifications?sessionToken=';
+
+        const GET_SETTING = {
+            'Type': 'GET'
+        };
+
+        const POST_SETTING = {
+            'Type': 'POST',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json, text/plain, */*'
+        };
+
+        function onLoad() {
+            pingSxs();
+        }
+
+        function getPingUrl() {
+            return `${baseUrl}${port}${pingPath}`;
+        }
+
+        function getSxsUrl() {
+            return `${baseUrl}${port}${sxsPath}/`;
+        }
+
+        function getWsUrl(token) {
+            return `${wsBaseUrl}${port}${sxsPath}${wsPath}${token}`;
+        }
+
+        function getPublicKeyUrl() {
+            return `${baseUrl}${port}${sxsPath}${getPublicKeyPath}`;
+        }
+
+        function getValueFrom(id) {
+            const value = document.getElementById(id).value;
+            if (value && value !== '') {
+                return value.trim();
+            } else {
+                alert(`Valid ${id} is required`);
+                throw `Valid ${id} is required`;
+            }
+        }
+
+        function getSymbology() {
+            const elements = document.querySelectorAll('input[name=symbology]:checked');
+            const checkedValue = Object.keys(elements).map(key => elements[key].value);
+            return checkedValue;
+        }
+
+        function makeRequest(requestSetting, url, body) {
+            let setting = Object.assign({}, requestSetting);
+            const type = setting['Type'];
+            delete setting['Type'];
+            const settingCollection = Object.keys(setting);
+
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.onload = function () {
+                    if (this.status >= 200 && this.status < 300) {
+                        resolve(xhr.response);
+                    } else {
+                        reject({
+                            status: this.status,
+                            statusText: xhr.statusText
+                        });
+                    }
+                };
+                xhr.onerror = function () {
+                    reject({
+                        status: this.status,
+                        statusText: xhr.statusText
+                    });
+                };
+                xhr.open(type, url, true);
+                if (settingCollection.length) {
+                    settingCollection.map(key => {
+                        xhr.setRequestHeader(key, setting[key]);
+                    });
+                }
+                xhr.send(body);
+            });
+        }
+
+        function getDataString() {
+            const publicKey = cryptography && cryptography.getAppPublicKey();
+            let data = {
+                command: 'handshake',
+                productId: getValueFrom('productId'),
+                apiKey: getValueFrom('apiKey'),
+                publicKey: publicKey,
+                instanceId: undefined,
+                symbology: JSON.stringify(getSymbology())
+            };
+            console.info(data);
+            return JSON.stringify(data);
+        }
+
+        function getConsoleStyle() {
+            const styles = [
+                'background: linear-gradient(#F78E11, #F35C19)',
+                'color: white',
+                'display: inline-block',
+                'text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3)',
+                'box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 5px 3px -5px rgba(0, 0, 0, 0.5), 0 -13px 5px -10px rgba(255, 255, 255, 0.4) inset',
+                'line-height: 20px',
+                'text-align: center',
+                'font-weight: bold',
+                'border-radius: 4px',
+                'padding-left: 8px',
+                'padding-right: 8px'
+            ].join(';');
+            return styles;
+        }
+
+        function pingSxs() {
+            const url = getPingUrl();
+
+            makeRequest(GET_SETTING, url, null)
+                .then(response => alert('Found sxs on port: ' + response));
+        }
+
+        function secureHandshake() {
+            getPublicKey()
+                .then(response => {
+                    const res = JSON.parse(response);
+                    const publicKey = res.publicKey;
+                    alert('Obtained public key: ' + publicKey);
+                    return generateKey(publicKey);
+                }).then(() => {
+                    const data = getDataString();
+                    return performEncryption(data)
+                }).then(cmd => {
+                    return performHandshake(cmd);
+                }).then(response => {
+                    return performDecryption(response);
+                }).then(response => {
+                    alert('Handshake response:' + response);
+                    var result = JSON.parse(response);
+                    return openws(result.sessionToken);
+                }).then(token => {
+                    return openapp(token);
+                });
+        }
+
+        function getPublicKey() {
+            const url = getPublicKeyUrl();
+            return makeRequest(GET_SETTING, url, null);
+        }
+
+        function generateKey(publicKey) {
+            return cryptography.addKey(publicKey).then(() => cryptography.generateKey());
+        }
+
+        function performEncryption(data) {
+            return cryptography.encrypt(data).catch((err) => alert(err.message));
+        }
+
+        function performDecryption(data) {
+            return cryptography.decrypt(data).catch((err) => {
+                const json = JSON.parse(data);
+                return (!json.isSuccess) ? Promise.resolve(data) : Promise.reject(err);
+            });
+        }
+
+        function performHandshake(cmd) {
+            const url = getSxsUrl();
+            return makeRequest(POST_SETTING, url, cmd)
+        }
+
+        function openws(token) {
+            return new Promise((resolve, reject) => {
+                const host = getWsUrl(token);
+
+                try {
+                    socket = new WebSocket(host);
+
+                    socket.onopen = function (openEvent) {
+                        alert('Web Socket opened');
+                        alert('Click OK to open an app');
+                        resolve(token);
+                    };
+
+                    socket.onmessage = function (messageEvent) {
+                        performDecryption(messageEvent.data)
+                            .then(data => {
+                                console.log(`%cWeb Socket event ${data}`, getConsoleStyle());
+                            });
+                    };
+                } catch (exception) {
+                    console.error(exception);
+                }
+            });
+        }
+
+        function openapp(token) {
+            let body = {
+                command: 'launch',
+                sessionToken: token,
+                appId: 'Quote',
+                context: '{ "entities": [{ "RIC": "WMT" }] }'
+            };
+            body = JSON.stringify(body);
+            const url = getSxsUrl();
+
+            return performEncryption(body)
+                .then(body => makeRequest(POST_SETTING, url, body))
+        }
+
+    </script>
+</body>
+
+</html>

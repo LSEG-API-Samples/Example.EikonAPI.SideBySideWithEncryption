@@ -1,0 +1,28 @@
+{
+  "name": "thomson-reuters-side-by-side-sample-with-encryption",
+  "version": "1.0.0",
+  "description": "This simple web application demonstrates how to securely integrate with Thomson Reuters Eikon via SxS API",
+  "main": "index.js",
+  "scripts": {
+    "build": "./node_modules/.bin/webpack",
+    "start": "node run.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.sami.int.thomsonreuters.com/universalcontainer/SideBySideSamplesForCustomer.git"
+  },
+  "keywords": [],
+  "author": "Sutthinart Khunvadhana",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://git.sami.int.thomsonreuters.com/universalcontainer/SideBySideSamplesForCustomer/issues"
+  },
+  "homepage": "https://git.sami.int.thomsonreuters.com/universalcontainer/SideBySideSamplesForCustomer#readme",
+  "devDependencies": {
+    "buffer": "^4.9.1",
+    "node-jose": "^0.10.0",
+    "opn": "^5.3.0",
+    "webpack": "^4.11.0",
+    "webpack-cli": "^3.0.2"
+  }
+}
