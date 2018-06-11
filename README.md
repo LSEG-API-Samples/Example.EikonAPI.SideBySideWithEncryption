@@ -19,8 +19,14 @@ $ git clone https://git.sami.int.thomsonreuters.com/universalcontainer/SideBySid
 $ cd SideBySideSamplesForCustomer
 
 # Install the dependencies
-$ npm install
+$ npm install 
 
-# Build and run
-$ npm run build && npm run start
+# Build library
+$ npm run build
+
+# To run the simple app
+$ npm run start:simple
+
+# To run the secure app
+$ npm run start:secure
 ```
