@@ -13,7 +13,7 @@ This simple web application demonstrates how to securely integrate with Thomson 
 
 ```
 # Clone this repo
-$ git clone https://git.sami.int.thomsonreuters.com/universalcontainer/SideBySideSamplesForCustomer.git
+$ git clone https://github.com/TR-API-Samples/Example.EikonAPI.SideBySideWithEncryption.git
 
 # Go into the repository
 $ cd SideBySideSamplesForCustomer
