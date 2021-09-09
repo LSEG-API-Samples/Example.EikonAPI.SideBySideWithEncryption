@@ -1,9 +1,9 @@
-# Thomson Reuters Side By Side Sample With Encryption
+# Refinitiv Side By Side Sample With Encryption
 
-This simple web application demonstrates how to securely integrate with Thomson Reuters Eikon via SxS API
+This simple web application demonstrates how to securely integrate with Refinitiv Eikon via SxS API
 
 ### Prerequisite
-- Valid Thomson Reuters Eikon credential [Request a Free Trial](https://financial.thomsonreuters.com/en/products/tools-applications/trading-investment-tools/eikon-trading-software.html)
+- Valid Refinitiv Eikon credential
 
 ### Getting start
 1. Login Eikon, then enter "cpurl://apps.cp./apps/appkeygenerator" in Eikon toolbar search
