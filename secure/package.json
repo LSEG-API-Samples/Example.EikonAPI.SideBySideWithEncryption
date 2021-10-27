@@ -1,7 +1,7 @@
 {
-  "name": "thomson-reuters-side-by-side-sample-with-encryption",
+  "name": "refinitiv-side-by-side-sample-with-encryption",
   "version": "1.0.0",
-  "description": "This simple web application demonstrates how to securely integrate with Thomson Reuters Eikon via SxS API",
+  "description": "This simple web application demonstrates how to securely integrate with Refinitiv Eikon via SxS API",
   "main": "index.js",
   "scripts": {
     "build": "./node_modules/.bin/webpack",
@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://git.sami.int.thomsonreuters.com/universalcontainer/SideBySideSamplesForCustomer.git"
+    "url": "https://github.com/Refinitiv-API-Samples/Example.EikonAPI.SideBySideWithEncryption.git"
   },
   "keywords": [],
   "author": "Sutthinart Khunvadhana",
   "license": "MIT",
   "bugs": {
-    "url": "https://git.sami.int.thomsonreuters.com/universalcontainer/SideBySideSamplesForCustomer/issues"
+    "url": "https://github.com/Refinitiv-API-Samples/Example.EikonAPI.SideBySideWithEncryption/issues"
   },
-  "homepage": "https://git.sami.int.thomsonreuters.com/universalcontainer/SideBySideSamplesForCustomer#readme",
+  "homepage": "https://github.com/Refinitiv-API-Samples/Example.EikonAPI.SideBySideWithEncryption#readme",
   "devDependencies": {
     "buffer": "^4.9.1",
     "node-jose": "^0.10.0",
