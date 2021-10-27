@@ -1,5 +1,7 @@
 # Refinitiv Side By Side Sample With Encryption
 
+**Update**: October 2021
+
 This simple web application demonstrates how to securely integrate with Refinitiv Eikon via SxS API
 
 ### Prerequisite
@@ -13,7 +15,7 @@ This simple web application demonstrates how to securely integrate with Refiniti
 
 ```
 # Clone this repo
-$ git clone https://github.com/TR-API-Samples/Example.EikonAPI.SideBySideWithEncryption.git
+$ git clone https://github.com/Refinitiv-API-Samples/Example.EikonAPI.SideBySideWithEncryption.git
 
 # Go into the repository
 $ cd SideBySideSamplesForCustomer
